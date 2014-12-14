@@ -1,8 +1,8 @@
 var app = angular.module('feature-toggler', []);
 
-app.constant('enabledFeatures', ["default-enabled-1", "default-enabled-2"]);
+app.constant('enabledFeatures', []);
 
-app.service('featureToggleService', function(enabledFeatures, $rootScope) {
+app.service('featureToggleService', function(enabledFeatures) {
     var self = this;
 
     var localFeatures = function() {
@@ -47,6 +47,7 @@ app.service('featureToggleService', function(enabledFeatures, $rootScope) {
             features.length = 0;
             updateLocalStorage();
         },
+
         isEnabled: function(name) {
             for(var i=0; i< features.length; i++) {
                 var feature = features[i];
@@ -55,7 +56,6 @@ app.service('featureToggleService', function(enabledFeatures, $rootScope) {
                     return feature.status;
                 }
 
-                $rootScope.$emit('feature-added');
             };
 
             addFeature(name, false);
@@ -64,7 +64,7 @@ app.service('featureToggleService', function(enabledFeatures, $rootScope) {
     };
 });
 
-app.directive('featureToggler', function(featureToggleService, $rootScope) {
+app.directive('featureToggler', function(featureToggleService) {
     return {
         restrict: 'E',
         link: function(scope) {
@@ -86,10 +86,6 @@ app.directive('featureToggler', function(featureToggleService, $rootScope) {
                 featureToggleService.addFeature(scope.newFeature, true);
                 scope.newFeature = "";
             };
-
-            $rootScope.$on('feature-added', function() {
-                scope.$apply();
-            });
         },
 
         template: '<div id="feature-toggler" ng-if="show">' +
