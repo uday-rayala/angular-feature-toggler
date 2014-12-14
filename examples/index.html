@@ -4,6 +4,9 @@
   </head>
   <body ng-app="example">
     <h1>Feature Toggle example</h1>
+    <div ng-controller="exampleController">
+      <p ng-if="!isDevMode">Go to dev mode change url to {{currentUrl}}#dev</p>
+    </div>
     <feature-toggler></feature-toggler>
     <script src="../bower_components/angular/angular.js"></script>
     <script src="../src/js/feature-toggler.js"></script>

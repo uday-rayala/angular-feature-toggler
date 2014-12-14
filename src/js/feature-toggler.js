@@ -36,6 +36,9 @@ app.service('featureToggleService', function(enabledFeatures, $rootScope) {
     return {
         features: features,
         addFeature: addFeature,
+        isDevMode: function() {
+            return window.location.hash === "#dev";
+        },
         toggle: function(feature) {
             feature.status = !feature.status;
             updateLocalStorage();
@@ -65,6 +68,7 @@ app.directive('featureToggler', function(featureToggleService, $rootScope) {
     return {
         restrict: 'E',
         link: function(scope) {
+            scope.show = featureToggleService.isDevMode();
             scope.features = featureToggleService.features;
             scope.showFeatures = false;
             scope.newFeature = "";
@@ -73,6 +77,11 @@ app.directive('featureToggler', function(featureToggleService, $rootScope) {
                 featureToggleService.clear();
                 scope.showFeatures = false;
             };
+
+            scope.toggleFeaturesPanel = function() {
+                scope.showFeatures = !scope.showFeatures;
+            };
+
             scope.add = function() {
                 featureToggleService.addFeature(scope.newFeature, true);
                 scope.newFeature = "";
@@ -83,7 +92,7 @@ app.directive('featureToggler', function(featureToggleService, $rootScope) {
             });
         },
 
-        template: '<div id="feature-toggler">' +
+        template: '<div id="feature-toggler" ng-if="show">' +
             '<ul ng-if="showFeatures">' +
             '<li>' +
             '<input type="text" ng-model="$parent.newFeature">' +
@@ -97,7 +106,7 @@ app.directive('featureToggler', function(featureToggleService, $rootScope) {
             '{{f.name}}' +
             '</li>' +
             '</ul>' +
-            '<span ng-click="showFeatures = !showFeatures">' +
+            '<span ng-click="toggleFeaturesPanel()">' +
             'Feature Toggles' +
             '</span>' +
             '</div>'
