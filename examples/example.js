@@ -1,9 +1,9 @@
 var app = angular.module('example', ["feature-toggler"]);
 
-app.constant('enabledFeatures', ["default-enabled-1", "default-enabled-2"]);
-
 app.controller('exampleController', function($scope, featureToggleService) {
     $scope.isDevMode = featureToggleService.isDevMode();
     $scope.currentUrl = window.location.href;
-    featureToggleService.isEnabled("enable-check");
+    $scope.check1 = featureToggleService.isEnabled("enable-check-1");
+    $scope.check2 = featureToggleService.isEnabled("enable-check-2");
+    $scope.check3 = featureToggleService.isEnabled("enable-check-3");
 });

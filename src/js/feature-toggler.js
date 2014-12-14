@@ -2,7 +2,7 @@ var app = angular.module('feature-toggler', []);
 
 app.constant('enabledFeatures', []);
 
-app.service('featureToggleService', function(enabledFeatures) {
+app.service('featureToggleService', function(enabledFeatures, $window) {
     var self = this;
 
     var localFeatures = function() {
@@ -35,19 +35,16 @@ app.service('featureToggleService', function(enabledFeatures) {
 
     return {
         features: features,
-        addFeature: addFeature,
         isDevMode: function() {
             return window.location.hash === "#dev" || window.location.hash === "#/dev";
         },
         toggle: function(feature) {
             feature.status = !feature.status;
-            updateLocalStorage();
         },
-        clear: function() {
-            features.length = 0;
+        save: function() {
             updateLocalStorage();
+            $window.location.reload();
         },
-
         isEnabled: function(name) {
             for(var i=0; i< features.length; i++) {
                 var feature = features[i];
@@ -71,31 +68,17 @@ app.directive('featureToggler', function(featureToggleService) {
             scope.show = featureToggleService.isDevMode();
             scope.features = featureToggleService.features;
             scope.showFeatures = false;
-            scope.newFeature = "";
             scope.toggle = featureToggleService.toggle;
-            scope.clear = function() {
-                featureToggleService.clear();
-                scope.showFeatures = false;
-            };
-
+            scope.save = featureToggleService.save;
             scope.toggleFeaturesPanel = function() {
                 scope.showFeatures = !scope.showFeatures;
-            };
-
-            scope.add = function() {
-                featureToggleService.addFeature(scope.newFeature, true);
-                scope.newFeature = "";
             };
         },
 
         template: '<div id="feature-toggler" ng-if="show">' +
             '<ul ng-if="showFeatures">' +
             '<li>' +
-            '<input type="text" ng-model="$parent.newFeature">' +
-            '<button ng-click="add()">Add</button>' +
-            '</li>' +
-            '<li>' +
-            '<button ng-click="clear()">Clear All</button>' +
+            '<button ng-click="save()">Save</button>' +
             '</li>' +
             '<li ng-repeat="f in features" ng-click="toggle(f)">' +
             '<span ng-class="{selected: f.status}"></span>' +
