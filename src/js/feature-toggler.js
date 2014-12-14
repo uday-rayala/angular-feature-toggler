@@ -69,7 +69,10 @@ app.directive('featureToggler', function(featureToggleService, $rootScope) {
             scope.showFeatures = false;
             scope.newFeature = "";
             scope.toggle = featureToggleService.toggle;
-            scope.clear = featureToggleService.clear;
+            scope.clear = function() {
+                featureToggleService.clear();
+                scope.showFeatures = false;
+            };
             scope.add = function() {
                 featureToggleService.addFeature(scope.newFeature, true);
                 scope.newFeature = "";
@@ -81,7 +84,7 @@ app.directive('featureToggler', function(featureToggleService, $rootScope) {
         },
 
         template: '<div id="feature-toggler">' +
-            '<ul ng-if="scope.showFeatures">' +
+            '<ul ng-if="showFeatures">' +
             '<li>' +
             '<input type="text" ng-model="$parent.newFeature">' +
             '<button ng-click="add()">Add</button>' +
@@ -94,7 +97,7 @@ app.directive('featureToggler', function(featureToggleService, $rootScope) {
             '{{f.name}}' +
             '</li>' +
             '</ul>' +
-            '<span ng-click="scope.showFeatures = !scope.showFeatures">' +
+            '<span ng-click="showFeatures = !showFeatures">' +
             'Feature Toggles' +
             '</span>' +
             '</div>'
