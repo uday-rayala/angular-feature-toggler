@@ -37,7 +37,7 @@ app.service('featureToggleService', function(enabledFeatures, $rootScope) {
         features: features,
         addFeature: addFeature,
         isDevMode: function() {
-            return window.location.hash === "#dev";
+            return window.location.hash === "#dev" || window.location.hash === "#/dev";
         },
         toggle: function(feature) {
             feature.status = !feature.status;
