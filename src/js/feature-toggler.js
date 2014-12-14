@@ -1,22 +1,15 @@
 var app = angular.module('feature-toggler', []);
 
-app.constant('enabledFeatures', ["Default Enabled 1", "Default Enabled 2"]);
+app.constant('enabledFeatures', ["default-enabled-1", "default-enabled-2"]);
 
 app.service('featureToggleService', function(enabledFeatures, $rootScope) {
     var self = this;
 
-    var features = sessionStorage.featuresOverride ?
-        JSON.parse(sessionStorage.featuresOverride) :
-        [];
-
-    if(features.length === 0) {
-        features = enabledFeatures.map(function(name){
-            return {
-                name: name,
-                status: true
-            };
-        });
-    }
+    var localFeatures = function() {
+        return sessionStorage.featuresOverride ?
+            JSON.parse(sessionStorage.featuresOverride) :
+            [];
+    };
 
     var updateLocalStorage = function() {
         sessionStorage.featuresOverride = angular.toJson(features);
@@ -29,11 +22,26 @@ app.service('featureToggleService', function(enabledFeatures, $rootScope) {
         }
     };
 
+    var features = localFeatures();
+
+    if(features.length === 0) {
+        features = enabledFeatures.map(function(name){
+            return {
+                name: name,
+                status: true
+            };
+        });
+    }
+
     return {
         features: features,
         addFeature: addFeature,
         toggle: function(feature) {
             feature.status = !feature.status;
+            updateLocalStorage();
+        },
+        clear: function() {
+            features.length = 0;
             updateLocalStorage();
         },
         isEnabled: function(name) {
@@ -58,7 +66,10 @@ app.directive('featureToggler', function(featureToggleService, $rootScope) {
         restrict: 'E',
         link: function(scope) {
             scope.features = featureToggleService.features;
+            scope.showFeatures = false;
+            scope.newFeature = "";
             scope.toggle = featureToggleService.toggle;
+            scope.clear = featureToggleService.clear;
             scope.add = function() {
                 featureToggleService.addFeature(scope.newFeature, true);
                 scope.newFeature = "";
@@ -70,16 +81,22 @@ app.directive('featureToggler', function(featureToggleService, $rootScope) {
         },
 
         template: '<div id="feature-toggler">' +
-            '<span>Feature Toggles</span>' +
-            '<ul>' +
-            '<li ng-repeat="f in features" ng-click="toggle(f)">' +
-            '{{f.name}}:' + '{{f.status}}' +
-            '</li>' +
+            '<ul ng-if="scope.showFeatures">' +
             '<li>' +
-            '<input type="text" ng-model="newFeature">' +
+            '<input type="text" ng-model="$parent.newFeature">' +
             '<button ng-click="add()">Add</button>' +
             '</li>' +
+            '<li>' +
+            '<button ng-click="clear()">Clear All</button>' +
+            '</li>' +
+            '<li ng-repeat="f in features" ng-click="toggle(f)">' +
+            '<span ng-class="{selected: f.status}"></span>' +
+            '{{f.name}}' +
+            '</li>' +
             '</ul>' +
+            '<span ng-click="scope.showFeatures = !scope.showFeatures">' +
+            'Feature Toggles' +
+            '</span>' +
             '</div>'
     };
 });
