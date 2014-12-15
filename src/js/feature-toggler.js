@@ -16,7 +16,6 @@ app.service('featureToggleService', ['enabledFeatures', '$window', function(enab
     };
 
     var updateLocalStorage = function() {
-        console.log("Updating");
         sessionStorage.featuresOverride = angular.toJson(features);
     };
 
