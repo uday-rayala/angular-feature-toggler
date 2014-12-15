@@ -11,20 +11,24 @@ app.service('featureToggleService', ['enabledFeatures', '$window', function(enab
             [];
     };
 
+    var hasLocal = function() {
+        return sessionStorage.featuresOverride;
+    };
+
     var updateLocalStorage = function() {
+        console.log("Updating");
         sessionStorage.featuresOverride = angular.toJson(features);
     };
 
     var addFeature = function(name, status) {
         if(name && name.length > 0) {
             features.push({name: name, status: status});
-            updateLocalStorage();
         }
     };
 
     var features = localFeatures();
 
-    if(features.length === 0) {
+    if(!hasLocal()) {
         features = enabledFeatures.map(function(name){
             return {
                 name: name,
@@ -49,6 +53,7 @@ app.service('featureToggleService', ['enabledFeatures', '$window', function(enab
             updateLocalStorage();
             $window.location.reload();
         },
+        hasLocal: hasLocal,
         isEnabled: function(name) {
             for(var i=0; i< features.length; i++) {
                 var feature = features[i];
@@ -75,6 +80,7 @@ app.directive('featureToggler', ['featureToggleService', function(featureToggleS
             scope.toggle = featureToggleService.toggle;
             scope.clear = featureToggleService.clear;
             scope.save = featureToggleService.save;
+            scope.showClear = featureToggleService.hasLocal();
             scope.toggleFeaturesPanel = function() {
                 scope.showFeatures = !scope.showFeatures;
             };
@@ -83,7 +89,7 @@ app.directive('featureToggler', ['featureToggleService', function(featureToggleS
         template: '<div id="feature-toggler" ng-if="show">' +
             '<ul ng-if="showFeatures">' +
             '<li>' +
-            '<button ng-click="clear()">Clear Local</button>' +
+            '<button ng-if="showClear" ng-click="clear()">Clear Local</button>' +
             '<button ng-click="save()">Save</button>' +
             '</li>' +
             '<li ng-repeat="f in features" ng-click="toggle(f)">' +
