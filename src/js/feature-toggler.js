@@ -2,7 +2,7 @@ var app = angular.module('feature-toggler', []);
 
 app.constant('enabledFeatures', []);
 
-app.service('featureToggleService', function(enabledFeatures, $window) {
+app.service('featureToggleService', ['enabledFeatures', '$window', function(enabledFeatures, $window) {
     var self = this;
 
     var localFeatures = function() {
@@ -63,9 +63,9 @@ app.service('featureToggleService', function(enabledFeatures, $window) {
             return false;
         }
     };
-});
+}]);
 
-app.directive('featureToggler', function(featureToggleService) {
+app.directive('featureToggler', ['featureToggleService', function(featureToggleService) {
     return {
         restrict: 'E',
         link: function(scope) {
@@ -96,4 +96,4 @@ app.directive('featureToggler', function(featureToggleService) {
             '</span>' +
             '</div>'
     };
-});
+}]);
