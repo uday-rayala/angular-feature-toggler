@@ -45,6 +45,10 @@
     background-color: #666666;
 }
 
+#feature-toggler button {
+    margin-right: 10px;
+}
+
 #feature-toggler input {
     width: 70%;
     margin-right: 10px;

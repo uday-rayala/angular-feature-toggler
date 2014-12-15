@@ -41,6 +41,10 @@ app.service('featureToggleService', function(enabledFeatures, $window) {
         toggle: function(feature) {
             feature.status = !feature.status;
         },
+        clear: function() {
+            delete sessionStorage.featuresOverride;
+            $window.location.reload();
+        },
         save: function() {
             updateLocalStorage();
             $window.location.reload();
@@ -69,6 +73,7 @@ app.directive('featureToggler', function(featureToggleService) {
             scope.features = featureToggleService.features;
             scope.showFeatures = false;
             scope.toggle = featureToggleService.toggle;
+            scope.clear = featureToggleService.clear;
             scope.save = featureToggleService.save;
             scope.toggleFeaturesPanel = function() {
                 scope.showFeatures = !scope.showFeatures;
@@ -78,6 +83,7 @@ app.directive('featureToggler', function(featureToggleService) {
         template: '<div id="feature-toggler" ng-if="show">' +
             '<ul ng-if="showFeatures">' +
             '<li>' +
+            '<button ng-click="clear()">Clear Local</button>' +
             '<button ng-click="save()">Save</button>' +
             '</li>' +
             '<li ng-repeat="f in features" ng-click="toggle(f)">' +
