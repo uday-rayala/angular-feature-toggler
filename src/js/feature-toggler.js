@@ -36,10 +36,14 @@ app.service('featureToggleService', ['enabledFeatures', '$window', function(enab
         });
     }
 
+    var endsWith = function(str, suffix) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    }
+
     return {
         features: features,
         isDevMode: function() {
-            return $window.location.hash === "#dev" || $window.location.hash === "#/dev";
+            return endsWith($window.location.hash, "dev");
         },
         toggle: function(feature) {
             feature.status = !feature.status;
