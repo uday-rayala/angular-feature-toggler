@@ -106,3 +106,22 @@ app.directive('featureToggler', ['featureToggleService', function(featureToggleS
             '</div>'
     };
 }]);
+
+app.directive('toggleIf', ['featureToggleService','ngIfDirective', function(featureToggleService, ngIfDirective) {
+    var ngIf = ngIfDirective[0];
+    return {
+        transclude: ngIf.transclude,
+        priority: ngIf.priority,
+        terminal: ngIf.terminal,
+        restrict: ngIf.restrict,
+
+        link: function($scope, $element, $attr) {
+            var value = featureToggleService.isEnabled($attr['toggleIf']);
+            $attr.ngIf = function() {
+                return value;
+            };
+
+            ngIf.link.apply(ngIf, arguments);
+        }
+    };
+}]);
